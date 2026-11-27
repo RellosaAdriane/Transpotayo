@@ -6,12 +6,11 @@ Transportayo is the backend prototype for the Web-Based Ride Booking and Transpo
 
 1. Use Node.js 22 or later. Start **MySQL** in XAMPP. Start **Apache** if you want to open phpMyAdmin.
 2. On a fresh checkout, run `npm.cmd ci` and `Copy-Item .env.example .env`. If your folder already has an `.env` and the prototype database, keep them and skip to step 5.
-3. In [phpMyAdmin](http://localhost/phpmyadmin), open the server-level **Import** tab and import [database/transportayo.sql](database/transportayo.sql). It creates `transportayo_prototype` and its six tables. Import into an empty schema. `DB_SYNC=false` uses the imported schema.
+3. In [phpMyAdmin](http://localhost/phpmyadmin), create an empty database named `transportayo_prototype`. Set `DB_SYNC=true` in `.env` so `npm.cmd run db:seed` creates the tables.
 4. Edit `.env`. Match the host, port, user and password to your local MySQL settings. Use `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"` to generate `JWT_SECRET`. Set separate local demo passwords (8 to 72 UTF-8 bytes) for the three `DEMO_*_PASSWORD` fields.
-5. Run these commands in the project folder.
+5. Run `npm.cmd run db:seed` in the project folder. Once seeding succeeds, set `DB_SYNC=false` in `.env` and start the API.
 
    ```powershell
-   npm.cmd run db:seed
    npm.cmd run start:dev
    ```
 
