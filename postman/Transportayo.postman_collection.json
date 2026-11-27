@@ -2,7 +2,7 @@
   "info": {
     "name": "Transportayo API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Set the three demo passwords in Collection Variables from your local .env. Run the requests in the listed order or follow the README to demonstrate vehicle CRUD manually."
+    "description": "Requests are labeled [Admin], [Driver], [Customer], or [Public]. Set the three demo passwords in the collection Variables tab from your local .env. Run the collection in the listed order or use the manual walkthrough in the README."
   },
   "variable": [
     {
@@ -108,7 +108,7 @@
   ],
   "item": [
     {
-      "name": "Login as admin",
+      "name": "[Admin] Login as admin",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/auth/login",
@@ -137,7 +137,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "for (const key of ['adminToken', 'driverToken', 'customerToken', 'testCustomerToken']) pm.collectionVariables.unset(key);",
+              "pm.collectionVariables.set('adminToken', '');",
               "pm.collectionVariables.set('runId', Date.now().toString().slice(-12) + Math.floor(Math.random() * 100).toString().padStart(2, '0'));"
             ]
           }
@@ -165,7 +165,7 @@
       ]
     },
     {
-      "name": "Login as driver",
+      "name": "[Driver] Login as driver",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/auth/login",
@@ -190,6 +190,15 @@
       },
       "event": [
         {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('driverToken', '');"
+            ]
+          }
+        },
+        {
           "listen": "test",
           "script": {
             "type": "text/javascript",
@@ -213,7 +222,7 @@
       ]
     },
     {
-      "name": "Login as customer",
+      "name": "[Customer] Login as customer",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/auth/login",
@@ -238,6 +247,15 @@
       },
       "event": [
         {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('customerToken', '');"
+            ]
+          }
+        },
+        {
           "listen": "test",
           "script": {
             "type": "text/javascript",
@@ -260,7 +278,7 @@
       ]
     },
     {
-      "name": "Current user",
+      "name": "[Admin] Current user",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/auth/me",
@@ -295,7 +313,7 @@
       ]
     },
     {
-      "name": "Protected route without token",
+      "name": "[Public] Protected route without token",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/vehicles",
@@ -322,7 +340,7 @@
       ]
     },
     {
-      "name": "Login with wrong password",
+      "name": "[Public] Login with wrong password",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/auth/login",
@@ -364,7 +382,7 @@
       ]
     },
     {
-      "name": "Create vehicle",
+      "name": "[Admin] Create vehicle",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/vehicles",
@@ -416,7 +434,7 @@
       ]
     },
     {
-      "name": "Read vehicle",
+      "name": "[Admin] Read vehicle",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
@@ -450,7 +468,7 @@
       ]
     },
     {
-      "name": "Update vehicle",
+      "name": "[Admin] Update vehicle",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
@@ -499,7 +517,7 @@
       ]
     },
     {
-      "name": "List vehicles",
+      "name": "[Admin] List vehicles",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/vehicles?page=1&pageSize=25",
@@ -533,7 +551,7 @@
       ]
     },
     {
-      "name": "Delete vehicle",
+      "name": "[Admin] Delete vehicle",
       "request": {
         "method": "DELETE",
         "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
@@ -562,7 +580,7 @@
       ]
     },
     {
-      "name": "Confirm deletion",
+      "name": "[Admin] Confirm deletion",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
@@ -595,7 +613,7 @@
       ]
     },
     {
-      "name": "Reject invalid vehicle input",
+      "name": "[Admin] Reject invalid vehicle input",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/vehicles",
@@ -643,7 +661,7 @@
       ]
     },
     {
-      "name": "Reject customer vehicle creation",
+      "name": "[Customer] Reject customer vehicle creation",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/vehicles",
@@ -691,7 +709,7 @@
       ]
     },
     {
-      "name": "Register customer",
+      "name": "[Public] Register customer",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/customers",
@@ -716,6 +734,15 @@
       },
       "event": [
         {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('runId', Date.now().toString().slice(-12) + Math.floor(Math.random() * 100).toString().padStart(2, '0'));"
+            ]
+          }
+        },
+        {
           "listen": "test",
           "script": {
             "type": "text/javascript",
@@ -736,7 +763,7 @@
       ]
     },
     {
-      "name": "Login as testCustomer",
+      "name": "[Customer] Login as testCustomer",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/auth/login",
@@ -761,6 +788,15 @@
       },
       "event": [
         {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('testCustomerToken', '');"
+            ]
+          }
+        },
+        {
           "listen": "test",
           "script": {
             "type": "text/javascript",
@@ -783,7 +819,7 @@
       ]
     },
     {
-      "name": "List customers",
+      "name": "[Admin] List customers",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/customers?page=1&pageSize=10",
@@ -818,7 +854,7 @@
       ]
     },
     {
-      "name": "Read own profile",
+      "name": "[Customer] Read own profile",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/customers/{{testCustomerId}}",
@@ -853,7 +889,7 @@
       ]
     },
     {
-      "name": "Block access to another customer",
+      "name": "[Customer] Block access to another customer",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/customers/{{testCustomerId}}",
@@ -886,7 +922,7 @@
       ]
     },
     {
-      "name": "Update own profile",
+      "name": "[Customer] Update own profile",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/customers/{{testCustomerId}}",
@@ -935,7 +971,7 @@
       ]
     },
     {
-      "name": "Reject a null name",
+      "name": "[Customer] Reject a null name",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/customers/{{testCustomerId}}",
@@ -983,7 +1019,7 @@
       ]
     },
     {
-      "name": "Deactivate customer",
+      "name": "[Admin] Deactivate customer",
       "request": {
         "method": "DELETE",
         "url": "{{baseUrl}}/customers/{{testCustomerId}}",
@@ -1012,7 +1048,7 @@
       ]
     },
     {
-      "name": "Reject inactive customer token",
+      "name": "[Customer] Reject inactive customer token",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/auth/me",
@@ -1045,7 +1081,7 @@
       ]
     },
     {
-      "name": "Create driver",
+      "name": "[Admin] Create driver",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/drivers",
@@ -1097,7 +1133,7 @@
       ]
     },
     {
-      "name": "List available drivers",
+      "name": "[Admin] List available drivers",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/drivers?status=available&page=1",
@@ -1131,7 +1167,7 @@
       ]
     },
     {
-      "name": "Read driver",
+      "name": "[Admin] Read driver",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/drivers/{{testDriverId}}",
@@ -1165,7 +1201,7 @@
       ]
     },
     {
-      "name": "Update driver availability",
+      "name": "[Admin] Update driver availability",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/drivers/{{testDriverId}}",
@@ -1214,7 +1250,7 @@
       ]
     },
     {
-      "name": "Find driver demo vehicle",
+      "name": "[Driver] Find driver demo vehicle",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/vehicles?pageSize=100",
@@ -1251,7 +1287,7 @@
       ]
     },
     {
-      "name": "Request ride",
+      "name": "[Customer] Request ride",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/rides",
@@ -1303,7 +1339,7 @@
       ]
     },
     {
-      "name": "List open rides",
+      "name": "[Driver] List open rides",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/rides?status=requested",
@@ -1337,7 +1373,7 @@
       ]
     },
     {
-      "name": "Read ride",
+      "name": "[Customer] Read ride",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/rides/{{rideId}}",
@@ -1371,7 +1407,7 @@
       ]
     },
     {
-      "name": "Reject payment before ride completion",
+      "name": "[Customer] Reject payment before ride completion",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/payments",
@@ -1419,7 +1455,7 @@
       ]
     },
     {
-      "name": "Reject impossible ride transition",
+      "name": "[Driver] Reject impossible ride transition",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/rides/{{rideId}}",
@@ -1467,7 +1503,7 @@
       ]
     },
     {
-      "name": "Accept ride",
+      "name": "[Driver] Accept ride",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/rides/{{rideId}}",
@@ -1516,7 +1552,7 @@
       ]
     },
     {
-      "name": "Release ride back to open queue",
+      "name": "[Driver] Release ride back to open queue",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/rides/{{rideId}}",
@@ -1566,7 +1602,7 @@
       ]
     },
     {
-      "name": "Admin assigns ride",
+      "name": "[Admin] Admin assigns ride",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/rides/{{rideId}}",
@@ -1615,7 +1651,7 @@
       ]
     },
     {
-      "name": "Start ride",
+      "name": "[Driver] Start ride",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/rides/{{rideId}}",
@@ -1664,7 +1700,7 @@
       ]
     },
     {
-      "name": "Complete ride",
+      "name": "[Driver] Complete ride",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/rides/{{rideId}}",
@@ -1713,7 +1749,7 @@
       ]
     },
     {
-      "name": "Reject deletion of assigned vehicle",
+      "name": "[Admin] Reject deletion of assigned vehicle",
       "request": {
         "method": "DELETE",
         "url": "{{baseUrl}}/vehicles/{{demoVehicleId}}",
@@ -1746,7 +1782,7 @@
       ]
     },
     {
-      "name": "Create temporary ride",
+      "name": "[Customer] Create temporary ride",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/rides",
@@ -1798,7 +1834,7 @@
       ]
     },
     {
-      "name": "Cancel temporary ride",
+      "name": "[Customer] Cancel temporary ride",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/rides/{{discardRideId}}",
@@ -1847,7 +1883,7 @@
       ]
     },
     {
-      "name": "Delete cancelled ride",
+      "name": "[Customer] Delete cancelled ride",
       "request": {
         "method": "DELETE",
         "url": "{{baseUrl}}/rides/{{discardRideId}}",
@@ -1876,7 +1912,7 @@
       ]
     },
     {
-      "name": "Reject an incorrect amount",
+      "name": "[Customer] Reject an incorrect amount",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/payments",
@@ -1924,7 +1960,7 @@
       ]
     },
     {
-      "name": "Create pending payment",
+      "name": "[Customer] Create pending payment",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/payments",
@@ -1976,7 +2012,7 @@
       ]
     },
     {
-      "name": "Reject duplicate payment",
+      "name": "[Customer] Reject duplicate payment",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/payments",
@@ -2024,7 +2060,7 @@
       ]
     },
     {
-      "name": "Delete pending payment",
+      "name": "[Admin] Delete pending payment",
       "request": {
         "method": "DELETE",
         "url": "{{baseUrl}}/payments/{{paymentId}}",
@@ -2053,7 +2089,7 @@
       ]
     },
     {
-      "name": "Record payment again",
+      "name": "[Customer] Record payment again",
       "request": {
         "method": "POST",
         "url": "{{baseUrl}}/payments",
@@ -2105,7 +2141,7 @@
       ]
     },
     {
-      "name": "Read payment",
+      "name": "[Customer] Read payment",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/payments/{{paymentId}}",
@@ -2139,7 +2175,7 @@
       ]
     },
     {
-      "name": "Mark payment paid",
+      "name": "[Admin] Mark payment paid",
       "request": {
         "method": "PATCH",
         "url": "{{baseUrl}}/payments/{{paymentId}}",
@@ -2188,7 +2224,7 @@
       ]
     },
     {
-      "name": "List paid payments",
+      "name": "[Customer] List paid payments",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/payments?status=paid&page=1",
@@ -2223,7 +2259,7 @@
       ]
     },
     {
-      "name": "Reject deletion of a paid payment",
+      "name": "[Admin] Reject deletion of a paid payment",
       "request": {
         "method": "DELETE",
         "url": "{{baseUrl}}/payments/{{paymentId}}",
