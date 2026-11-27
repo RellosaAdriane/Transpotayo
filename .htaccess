@@ -1,0 +1,2 @@
+# Transportayo is served by NestJS on its own port. Keep source and local secrets out of Apache.
+Require all denied
