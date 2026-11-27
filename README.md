@@ -27,15 +27,15 @@ Import [Transportayo.postman_collection.json](postman/Transportayo.postman_colle
 | `driverPassword` | `DEMO_DRIVER_PASSWORD` | `driver@transportayo.test` |
 | `customerPassword` | `DEMO_CUSTOMER_PASSWORD` | `customer@transportayo.test` |
 
-Select **Run collection** to run all five folders in order. The collection saves the JWTs and resource IDs during the run. The login requests use the accounts created by `db:seed`. The runner adds demo rows, including a completed ride and a paid payment record. Keep the exported collection's password and token fields blank when submitting. [Postman Collection Runner documentation](https://learning.postman.com/docs/tests-and-scripts/running-collections/intro-to-collection-runs/intro-to-collection-runs-overview/)
+Select **Run collection** to run the requests in the listed order. The collection saves the JWTs and resource IDs during the run. The login requests use the accounts created by `db:seed`. The runner adds demo rows, including a completed ride and a paid payment record. Keep the exported collection's password and token fields blank when submitting. [Postman Collection Runner documentation](https://learning.postman.com/docs/tests-and-scripts/running-collections/intro-to-collection-runs/intro-to-collection-runs-overview/)
 
 ### Live demo in six steps
 
 1. Show the output of `npm.cmd run start:dev`.
-2. In **1. Authenticate**, send **Login as admin** and **Login as driver**. The second login supplies the driver ID for vehicle CRUD.
-3. In **2. Vehicle CRUD demo**, send **Create vehicle**, **Read vehicle**, **Update vehicle** and **Delete vehicle**. The expected responses are `201`, `200`, `200` and `204`. Send **Confirm deletion** to see `404`.
+2. Send **Login as admin** and **Login as driver**. The second login supplies the driver ID for vehicle CRUD.
+3. Send **Create vehicle**, **Read vehicle**, **Update vehicle** and **Delete vehicle**. The expected responses are `201`, `200`, `200` and `204`. Send **Confirm deletion** to see `404`.
 4. Trace the create request from [VehiclesController](src/vehicles/vehicles.module.ts) to [VehiclesService](src/vehicles/vehicles.service.ts), then show the [Vehicle entity](src/database/entities.ts) and its repository write. Explain how the saved row becomes a JSON response.
-5. In **1. Authenticate**, send **Protected route without token** and show `401`.
+5. Send **Protected route without token** and show `401`.
 6. In phpMyAdmin, show the driver and vehicles tables. Refresh the vehicles table after creating or updating the vehicle so you can show the row. After deleting it, refresh again to show its absence. The complete collection also leaves a completed ride and a paid payment for inspection.
 
 For a 5–10 minute video, narrate those steps yourself. The [technical report](docs/Transportayo-Technical-Documentation.pdf) has an editable cover-page field for your shareable recording link. The [presentation slides](docs/Transportayo-Presentation.pptx) follow the live demo order.
