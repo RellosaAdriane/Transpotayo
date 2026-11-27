@@ -59,4 +59,4 @@ For the manual booking demo, work through Customer request, Driver completion, C
 5. In **Login**, send **[Public] Protected route without token** and show `401`.
 6. In phpMyAdmin, show the driver and vehicles tables. Refresh the vehicles table after creating or updating the vehicle so you can show the row. After deleting it, refresh again to show its absence. The complete collection also leaves a completed ride and a paid payment for inspection.
 
-For a 5–10 minute video, narrate those steps yourself. The [technical report](docs/Transportayo-Technical-Documentation.pdf) has an editable cover-page field for your shareable recording link. The [presentation slides](docs/Transportayo-Presentation.pptx) follow the live demo order.
+For a 5–10 minute video, narrate those steps yourself.
