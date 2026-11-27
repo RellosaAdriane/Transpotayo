@@ -91,3 +91,5 @@ export class Payment {
 }
 
 export const entities = [User, Customer, Driver, Vehicle, Ride, Payment];
+
+export const ACTIVE_RIDE_STATUSES = [RideStatus.Requested, RideStatus.Accepted, RideStatus.InProgress];
