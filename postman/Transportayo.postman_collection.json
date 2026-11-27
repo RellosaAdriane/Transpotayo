@@ -1,0 +1,2284 @@
+{
+  "info": {
+    "name": "Transportayo API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Set the three demo passwords in Collection Variables from your local .env. Run all folders in order or follow the README to demonstrate vehicle CRUD manually."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@transportayo.test",
+      "type": "string"
+    },
+    {
+      "key": "driverEmail",
+      "value": "driver@transportayo.test",
+      "type": "string"
+    },
+    {
+      "key": "customerEmail",
+      "value": "customer@transportayo.test",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "driverPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "driverToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testCustomerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "runId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testCustomerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoDriverId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testDriverId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoVehicleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "vehicleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "rideId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "discardRideId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paymentId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authenticate",
+      "item": [
+        {
+          "name": "Login as admin",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "for (const key of ['adminToken', 'driverToken', 'customerToken', 'testCustomerToken']) pm.collectionVariables.unset(key);",
+                  "pm.collectionVariables.set('runId', Date.now().toString().slice(-12) + Math.floor(Math.random() * 100).toString().padStart(2, '0'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  pm.test(\"JWT returned\", function () { pm.expect(body.accessToken).to.match(/^[-\\w]+\\.[-\\w]+\\.[-\\w]+$/); });",
+                  "  pm.test(\"Correct user role\", function () { pm.expect(body.user.role).to.equal(\"admin\"); });",
+                  "  if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set(\"adminToken\", String(body.accessToken));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login as driver",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{driverEmail}}\",\n  \"password\": \"{{driverPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  pm.test(\"JWT returned\", function () { pm.expect(body.accessToken).to.match(/^[-\\w]+\\.[-\\w]+\\.[-\\w]+$/); });",
+                  "  pm.test(\"Correct user role\", function () { pm.expect(body.user.role).to.equal(\"driver\"); });",
+                  "  if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set(\"driverToken\", String(body.accessToken));",
+                  "    pm.collectionVariables.set(\"demoDriverId\", String(body.user.profileId));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login as customer",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  pm.test(\"JWT returned\", function () { pm.expect(body.accessToken).to.match(/^[-\\w]+\\.[-\\w]+\\.[-\\w]+$/); });",
+                  "  pm.test(\"Correct user role\", function () { pm.expect(body.user.role).to.equal(\"customer\"); });",
+                  "  if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set(\"customerToken\", String(body.accessToken));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  pm.test(\"Administrator role\", function () { pm.expect(body.role).to.equal(\"admin\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Protected route without token",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });",
+                  "if (pm.response.code === 401) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Bearer token required\", function () { pm.expect(body.message).to.equal(\"Bearer token required\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login with wrong password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"invalid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });",
+                  "if (pm.response.code === 401) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Credential error\", function () { pm.expect(body.message).to.equal(\"Invalid email or password\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Vehicle CRUD demo",
+      "item": [
+        {
+          "name": "Create vehicle",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/vehicles",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"driverId\": {{demoDriverId}},\n  \"plateNumber\": \"P{{runId}}\",\n  \"make\": \"Toyota\",\n  \"model\": \"Vios\",\n  \"vehicleYear\": 2023\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Vehicle saved\", function () { pm.expect(body.model).to.equal(\"Vios\"); });",
+                  "  if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"vehicleId\", String(body.id));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read vehicle",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response has the saved ID\", function () { pm.expect(String(body.id)).to.equal(pm.collectionVariables.get(\"vehicleId\")); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update vehicle",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"Vios XLE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Updated model\", function () { pm.expect(body.model).to.equal(\"Vios XLE\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List vehicles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles?page=1&pageSize=25",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Paginated response\", function () { pm.expect(body.items).to.be.an(\"array\"); pm.expect(body.total).to.be.a(\"number\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete vehicle",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });",
+                  "if (pm.response.code !== 204) pm.execution.setNextRequest(null);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirm deletion",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles/{{vehicleId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 404', function () { pm.response.to.have.status(404); });",
+                  "if (pm.response.code === 404) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject invalid vehicle input",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/vehicles",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"driverId\": -1,\n  \"plateNumber\": \"!\",\n  \"make\": \"Toyota\",\n  \"model\": \"Vios\",\n  \"vehicleYear\": 1700\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+                  "if (pm.response.code === 400) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject customer vehicle creation",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/vehicles",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"driverId\": {{demoDriverId}},\n  \"plateNumber\": \"P{{runId}}\",\n  \"make\": \"Toyota\",\n  \"model\": \"Vios\",\n  \"vehicleYear\": 2023\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });",
+                  "if (pm.response.code === 403) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Customers and drivers",
+      "item": [
+        {
+          "name": "Register customer",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/customers",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Postman\",\n  \"lastName\": \"Customer\",\n  \"phone\": \"{{runId}}\",\n  \"email\": \"customer-{{runId}}@example.test\",\n  \"password\": \"{{customerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"testCustomerId\", String(body.id));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login as testCustomer",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer-{{runId}}@example.test\",\n  \"password\": \"{{customerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  pm.test(\"JWT returned\", function () { pm.expect(body.accessToken).to.match(/^[-\\w]+\\.[-\\w]+\\.[-\\w]+$/); });",
+                  "  pm.test(\"Correct user role\", function () { pm.expect(body.user.role).to.equal(\"customer\"); });",
+                  "  if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set(\"testCustomerToken\", String(body.accessToken));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List customers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/customers?page=1&pageSize=10",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  pm.test(\"Paginated response\", function () { pm.expect(body.items).to.be.an(\"array\"); pm.expect(body.total).to.be.a(\"number\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read own profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/customers/{{testCustomerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{testCustomerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  pm.test(\"Response has the saved ID\", function () { pm.expect(String(body.id)).to.equal(pm.collectionVariables.get(\"testCustomerId\")); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Block access to another customer",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/customers/{{testCustomerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });",
+                  "if (pm.response.code === 403) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update own profile",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/customers/{{testCustomerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{testCustomerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Name updated\", function () { pm.expect(body.firstName).to.equal(\"Updated\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject a null name",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/customers/{{testCustomerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{testCustomerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+                  "if (pm.response.code === 400) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deactivate customer",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/customers/{{testCustomerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });",
+                  "if (pm.response.code !== 204) pm.execution.setNextRequest(null);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject inactive customer token",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{testCustomerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });",
+                  "if (pm.response.code === 401) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create driver",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/drivers",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Postman\",\n  \"lastName\": \"Driver\",\n  \"phone\": \"{{runId}}\",\n  \"email\": \"driver-{{runId}}@example.test\",\n  \"password\": \"{{driverPassword}}\",\n  \"licenseNumber\": \"LIC-{{runId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response omits passwords\", function () { pm.expect(pm.response.text()).not.to.match(/\"password(?:Hash)?\"\\s*:/i); });",
+                  "  if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"testDriverId\", String(body.id));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List available drivers",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/drivers?status=available&page=1",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Paginated response\", function () { pm.expect(body.items).to.be.an(\"array\"); pm.expect(body.total).to.be.a(\"number\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read driver",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/drivers/{{testDriverId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response has the saved ID\", function () { pm.expect(String(body.id)).to.equal(pm.collectionVariables.get(\"testDriverId\")); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update driver availability",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/drivers/{{testDriverId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"busy\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is busy\", function () { pm.expect(body.status).to.equal(\"busy\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Ride lifecycle",
+      "item": [
+        {
+          "name": "Find driver demo vehicle",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/vehicles?pageSize=100",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{driverToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Seeded vehicle exists\", function () { pm.expect(body.items.some(vehicle => vehicle.plateNumber === \"DEMO-001\")).to.be.true; });",
+                  "  if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set(\"demoVehicleId\", String((body.items.find(vehicle => vehicle.plateNumber === \"DEMO-001\") || {}).id));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Request ride",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rides",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickupLocation\": \"Dasmarinas City Hall\",\n  \"dropoffLocation\": \"SM City Dasmarinas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is requested\", function () { pm.expect(body.status).to.equal(\"requested\"); });",
+                  "  if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"rideId\", String(body.id));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List open rides",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/rides?status=requested",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{driverToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Paginated response\", function () { pm.expect(body.items).to.be.an(\"array\"); pm.expect(body.total).to.be.a(\"number\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read ride",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/rides/{{rideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response has the saved ID\", function () { pm.expect(String(body.id)).to.equal(pm.collectionVariables.get(\"rideId\")); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject payment before ride completion",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/payments",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rideId\": {{rideId}},\n  \"amount\": 125,\n  \"method\": \"cash\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+                  "if (pm.response.code === 409) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject impossible ride transition",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/rides/{{rideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{driverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+                  "if (pm.response.code === 409) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Accept ride",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/rides/{{rideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{driverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\",\n  \"vehicleId\": {{demoVehicleId}},\n  \"fare\": 125\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is accepted\", function () { pm.expect(body.status).to.equal(\"accepted\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Release ride back to open queue",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/rides/{{rideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{driverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"requested\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is requested\", function () { pm.expect(body.status).to.equal(\"requested\"); });",
+                  "  pm.test(\"Assignment cleared\", function () { pm.expect(body.driverId).to.be.null; pm.expect(body.vehicleId).to.be.null; });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin assigns ride",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/rides/{{rideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\",\n  \"vehicleId\": {{demoVehicleId}},\n  \"fare\": 125\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is accepted\", function () { pm.expect(body.status).to.equal(\"accepted\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Start ride",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/rides/{{rideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{driverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in-progress\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is in-progress\", function () { pm.expect(body.status).to.equal(\"in-progress\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Complete ride",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/rides/{{rideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{driverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is completed\", function () { pm.expect(body.status).to.equal(\"completed\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject deletion of assigned vehicle",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/vehicles/{{demoVehicleId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+                  "if (pm.response.code === 409) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create temporary ride",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/rides",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickupLocation\": \"Dasmarinas City Hall\",\n  \"dropoffLocation\": \"SM City Dasmarinas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is requested\", function () { pm.expect(body.status).to.equal(\"requested\"); });",
+                  "  if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"discardRideId\", String(body.id));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel temporary ride",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/rides/{{discardRideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is cancelled\", function () { pm.expect(body.status).to.equal(\"cancelled\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete cancelled ride",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/rides/{{discardRideId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });",
+                  "if (pm.response.code !== 204) pm.execution.setNextRequest(null);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Payment records",
+      "item": [
+        {
+          "name": "Reject an incorrect amount",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/payments",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rideId\": {{rideId}},\n  \"amount\": 1,\n  \"method\": \"cash\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });",
+                  "if (pm.response.code === 400) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create pending payment",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/payments",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rideId\": {{rideId}},\n  \"amount\": 125,\n  \"method\": \"cash\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is pending\", function () { pm.expect(body.status).to.equal(\"pending\"); });",
+                  "  if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"paymentId\", String(body.id));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject duplicate payment",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/payments",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rideId\": {{rideId}},\n  \"amount\": 125,\n  \"method\": \"cash\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+                  "if (pm.response.code === 409) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete pending payment",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/payments/{{paymentId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 204', function () { pm.response.to.have.status(204); });",
+                  "if (pm.response.code !== 204) pm.execution.setNextRequest(null);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Record payment again",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/payments",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rideId\": {{rideId}},\n  \"amount\": 125,\n  \"method\": \"cash\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is pending\", function () { pm.expect(body.status).to.equal(\"pending\"); });",
+                  "  if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set(\"paymentId\", String(body.id));",
+                  "  }",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Read payment",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/payments/{{paymentId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Response has the saved ID\", function () { pm.expect(String(body.id)).to.equal(pm.collectionVariables.get(\"paymentId\")); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark payment paid",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/payments/{{paymentId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"paid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Status is paid\", function () { pm.expect(body.status).to.equal(\"paid\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List paid payments",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/payments?status=paid&page=1",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.test(\"Paginated response\", function () { pm.expect(body.items).to.be.an(\"array\"); pm.expect(body.total).to.be.a(\"number\"); });",
+                  "  pm.test(\"Paid payment included\", function () { pm.expect(body.items.map(payment => String(payment.id))).to.include(pm.collectionVariables.get(\"paymentId\")); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject deletion of a paid payment",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/payments/{{paymentId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', function () { pm.response.to.have.status(409); });",
+                  "if (pm.response.code === 409) {",
+                  "  const body = pm.response.json();",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
