@@ -1,0 +1,37 @@
+{
+  "name": "transportayo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Transportayo ride booking backend prototype",
+  "scripts": {
+    "start:dev": "node --env-file=.env --watch -r ts-node/register src/main.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file=.env dist/main.js",
+    "db:seed": "node --env-file=.env -r ts-node/register src/database/seed.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.2.12",
+    "@nestjs/core": "^11.2.12",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/platform-express": "^11.2.12",
+    "@nestjs/throttler": "^6.8.0",
+    "@nestjs/typeorm": "^11.0.3",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "mysql2": "^3.24.6",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typeorm": "^0.3.31"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.7",
+    "newman": "^6.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
