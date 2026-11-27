@@ -6,6 +6,7 @@ import { databaseOptions } from './database/config';
 import { PaymentsModule } from './payments/payments.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { RidesModule } from './rides/rides.module';
+import { SystemController } from './system/system.controller';
 import { VehiclesModule } from './vehicles/vehicles.module';
 
 @Module({
@@ -20,5 +21,6 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     RidesModule,
     PaymentsModule,
   ],
+  controllers: [SystemController],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
 # Transportayo
 
-Transportayo is the backend prototype for the Web-Based Ride Booking and Transportation Assistance System proposed in Lab 03. It has 26 REST endpoints covering login, customers, drivers, vehicles, rides, and payment records. It uses Node.js, NestJS, TypeORM, MySQL (tested on XAMPP MariaDB), bcrypt and JWT. Postman serves as the client for the demo.
+Transportayo is the backend prototype for the Web-Based Ride Booking and Transportation Assistance System proposed in Lab 03. It has 28 REST endpoints covering system checks, login, customers, drivers, vehicles, rides, and payment records. It uses Node.js, NestJS, TypeORM, MySQL (tested on XAMPP MariaDB), bcrypt and JWT. Postman serves as the client for the demo.
 
 ## Run locally on Windows
 
@@ -27,7 +27,14 @@ Import [Transportayo.postman_collection.json](postman/Transportayo.postman_colle
 | `driverPassword` | `DEMO_DRIVER_PASSWORD` | `driver@transportayo.test` |
 | `customerPassword` | `DEMO_CUSTOMER_PASSWORD` | `customer@transportayo.test` |
 
-Open the folder for the feature you want to test. The collection has **Registration**, **Login**, **Customers**, **Drivers**, **Vehicles**, **Rides**, and **Payments** folders. **Registration** contains public customer signup. Admins create driver accounts in **Drivers**.
+Start in **System Checks**. Both requests run without a login.
+
+| Request | Endpoint | Expected result |
+| --- | --- | --- |
+| **Check server status** | `GET /api/health` | `200` with `{"status":"ok"}` |
+| **Check database connection** | `GET /api/db-test` | `200` with `{"status":"connected"}` or `503` if the running API cannot reach MySQL |
+
+The other folders are **Registration**, **Login**, **Customers**, **Drivers**, **Vehicles**, **Rides**, and **Payments**. **Registration** contains public customer signup. Admins create driver accounts in **Drivers**.
 
 Select **Run collection** to run all folders in the listed order. The collection saves the JWTs and resource IDs during the run. The main login requests use the accounts created by `db:seed`. The runner adds demo rows, including a completed ride and a paid payment record. Keep the exported collection's password and token fields blank when submitting. [Postman Collection Runner documentation](https://learning.postman.com/docs/tests-and-scripts/running-collections/intro-to-collection-runs/intro-to-collection-runs-overview/)
 
@@ -46,7 +53,7 @@ For the manual booking demo, work through Customer request, Driver completion, C
 
 ### Live demo in six steps
 
-1. Show the output of `npm.cmd run start:dev`.
+1. Show the output of `npm.cmd run start:dev`, then send both requests in **System Checks**.
 2. In **Login**, send **[Admin] Login as admin** and **[Driver] Login as driver**. The second login supplies the driver ID for vehicle CRUD.
 3. In **Vehicles**, send the **[Admin]** requests **Create vehicle**, **Read vehicle**, **Update vehicle** and **Delete vehicle**. The expected responses are `201`, `200`, `200` and `204`. Send **Confirm deletion** to see `404`.
 4. Trace the create request from [VehiclesController](src/vehicles/vehicles.module.ts) to [VehiclesService](src/vehicles/vehicles.service.ts), then show the [Vehicle entity](src/database/entities.ts) and its repository write. Explain how the saved row becomes a JSON response.

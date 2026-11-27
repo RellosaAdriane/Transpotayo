@@ -113,6 +113,65 @@
   ],
   "item": [
     {
+      "name": "System Checks",
+      "item": [
+        {
+          "name": "[Public] Check server status",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/health",
+            "description": "Checks whether the API is accepting requests."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  pm.test(\"Status is ok\", function () { pm.expect(pm.response.json().status).to.equal(\"ok\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "[Public] Check database connection",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/db-test",
+            "description": "Runs a read-only database probe. Returns HTTP 503 if the connection is unavailable."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  pm.test(\"Status is connected\", function () { pm.expect(pm.response.json().status).to.equal(\"connected\"); });",
+                  "} else {",
+                  "  pm.execution.setNextRequest(null);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Registration",
       "item": [
         {
