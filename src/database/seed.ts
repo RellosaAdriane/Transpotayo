@@ -33,14 +33,22 @@ async function seed() {
         }
         if (user.role === Role.Driver) {
           const drivers = manager.getRepository(Driver);
-          const driver = await drivers.save(drivers.create({
+          await drivers.save(drivers.create({
             userId: user.id, firstName: 'Demo', lastName: 'Driver',
             phone: '09170000002', licenseNumber: 'DEMO-LICENSE',
           }));
-          await manager.insert(Vehicle, {
-            driverId: driver.id, plateNumber: 'DEMO-001', make: 'Toyota', model: 'Vios', vehicleYear: 2023,
-          });
         }
+      }
+      const driverAccount = await manager.findOneByOrFail(User, { email: 'driver@transportayo.test' });
+      const driver = await manager.findOneByOrFail(Driver, { userId: driverAccount.id });
+      const vehicle = await manager.findOneBy(Vehicle, { plateNumber: 'DEMO-001' });
+      if (vehicle && vehicle.driverId !== driver.id) {
+        throw new Error('DEMO-001 belongs to a different driver');
+      }
+      if (!vehicle) {
+        await manager.insert(Vehicle, {
+          driverId: driver.id, plateNumber: 'DEMO-001', make: 'Toyota', model: 'Vios', vehicleYear: 2023,
+        });
       }
     });
     console.log('Demo accounts ready. Log in using admin, driver or customer @transportayo.test and the matching password in .env.');
